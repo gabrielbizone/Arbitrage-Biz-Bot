@@ -128,16 +128,29 @@ def quote_swap(chain_id: int, from_addr: str, to_addr: str, amount: int) -> dict
     """
     url = f"https://api.1inch.io/v4.0/{chain_id}/quote"
     params = {
-        "fromTokenAddress": from_addr,
-        "toTokenAddress": to_addr,
-        "amount": str(amount),
-    }
-    response = requests.get(url, params=params, timeout=15)
-    response.raise_for_status()
-    return response.json()
-
-
-def send_telegram_message(token: str, chat_id: str, message: str) -> None:
+    try:
+        # Perform the GET request with a timeout.  Any RequestException (e.g.,
+        # ConnectionError, Timeout, HTTPError) will be caught below and
+        # handled gracefully.
+        response = requests.get(url, params=params, timeout=15)
+        # If the response has an HTTP error status (4xx or 5xx), raise it
+        response.raise_for_status()
+        try:
+            # Attempt to parse the response as JSON.  Some providers may
+            # return HTML or other non‑JSON content when rate limited or
+            # unavailable, which will cause json() to raise a ValueError.
+            return response.json()
+        except ValueError:
+            # Return None to signal that parsing failed; the caller can decide
+            # how to handle a missing response (e.g., skip this token).
+            return None
+    except requests.RequestException as err:
+        # Catch network‑related errors (timeout, connection issues, HTTP errors)
+        # and return None so that the caller can skip this token.  We log
+        # the exception here for debugging purposes.
+        print(f"Network error during quote: {err}")
+        return None
+n: str, chat_id: str, message: str) -> None:
     """Send a notification via Telegram bot.
 
     Parameters
