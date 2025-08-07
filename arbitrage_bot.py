@@ -126,8 +126,17 @@ def quote_swap(chain_id: int, from_addr: str, to_addr: str, amount: int) -> dict
     dict
         JSON response from the 1inch API.
     """
+           
+    
     url = f"https://api.1inch.io/v4.0/{chain_id}/quote"
     params = {
+                "fromTokenAddress": from_addr,
+        "toTokenAddress": to_addr,
+        "amount": str(amount),
+
+                                }
+
+
     try:
         # Perform the GET request with a timeout.  Any RequestException (e.g.,
         # ConnectionError, Timeout, HTTPError) will be caught below and
