@@ -1,4 +1,2 @@
-requests
-pytz
-gspread
-google-auth
+aiohttp==3.9.*
+requests>=2.31.0
