@@ -1,0 +1,71 @@
+# tokens_config.py
+# Endereços padrão por chain. Você pode sobrescrever por ENV:
+# - TOKENS_137="addr1,addr2,addr3,..."
+# - TOKENS_42161="addr1,addr2,addr3,..."
+# - TOKENS_56="addr1,addr2,addr3,..."
+#
+# Dica: prefira contratos "nativos" de cada rede (ex.: USDC nativo em Arbitrum).
+# Observação: USDT no Polygon tem variantes. Se quiser usá-lo, recomendo passar via ENV TOKENS_137.
+
+import os
+
+# Ordem de preferência (estáveis e blue chips primeiro)
+_PREFERRED = ["USDC", "USDT", "DAI", "WETH", "WBTC", "WMATIC", "LINK", "AAVE"]
+
+# ===== DEFAULTS =====
+TOKENS_BY_CHAIN = {
+    137: {  # Polygon
+        "USDC":   "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+        # "USDT":   "<adicione via ENV se desejar>",
+        "DAI":    "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
+        "WETH":   "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
+        "WBTC":   "0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6",
+        "WMATIC": "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+        "LINK":   "0x53e0bca35ec356bd5dddfebbd1fc0fd03fabad39",
+        "AAVE":   "0xd6df932a45c0f255f85145f286ea0b292b21c90b",
+    },
+    42161: {  # Arbitrum
+        "USDC": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",  # USDC nativo
+        "USDT": "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9",
+        "DAI":  "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1",
+        "WETH": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+        "WBTC": "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f",
+        "LINK": "0xf97f4df75117a78c1a5a0dbb814af92458539fb4",
+        "AAVE": "0xba5bDe662c17e2aDFF1075610382B9B691296350",
+    },
+    56: {  # BNB Smart Chain
+        "USDC": "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
+        "USDT": "0x55d398326f99059ff775485246999027b3197955",
+        "DAI":  "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3",
+        "WETH": "0x2170Ed0880ac9A755fd29B2688956BD959F933F",  # ETH (pegged)
+        "WBTC": "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
+        "LINK": "0xF8A0BF9cF54Bb92F17374d9e9A321E6a111a51bD",
+        "AAVE": "0xfb6115445Bff7b52FeB98650C87f44907E58f802",
+    },
+}
+
+def _parse_addr_list(s: str):
+    """Converte 'addr1,addr2,...' → [addr1, addr2, ...], filtrando inválidos."""
+    if not s:
+        return []
+    addrs = []
+    for x in s.split(","):
+        a = x.strip()
+        if a.lower().startswith("0x") and len(a) == 42:
+            addrs.append(a)
+    return addrs
+
+def get_default_tokens_for_chain(chain_id: int):
+    """Retorna lista de endereços para a chain.
+    Prioridade:
+      1) Se houver ENV TOKENS_<chain_id>, usa exatamente essa lista.
+      2) Caso contrário, usa os defaults ordenados por _PREFERRED (ignora ausentes).
+    """
+    env_key = f"TOKENS_{chain_id}"
+    from_env = _parse_addr_list(os.getenv(env_key, ""))
+    if from_env:
+        return from_env
+
+    m = TOKENS_BY_CHAIN.get(chain_id, {})
+    ordered = [m[k] for k in _PREFERRED if k in m]
+    return ordered
