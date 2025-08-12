@@ -14,7 +14,7 @@ Bot assíncrono para varrer arbitragem **simples (2 swaps)** e **triangular (3 s
 - `requirements.txt` — dependências.
 
 ## Como rodar no Render (Background Worker)
-1. **New → Background Worker** e conecte seu repositório.[Uploading README_patch.md…]()
+1. **New → Background Worker** e conecte seu repositório.
 
 2. **Root Directory**: raiz do repo (ou subpasta se você usar).
 3. **Build Command**: `pip install -r requirements.txt`
@@ -53,20 +53,4 @@ Bot assíncrono para varrer arbitragem **simples (2 swaps)** e **triangular (3 s
 ## O que inclui
 - **Agregador novo:** ParaSwap (além de 1inch, 0x, KyberSwap, OpenOcean, Odos).
 - **Mais redes suportadas:** Ethereum(1), Optimism(10), Base(8453), Avalanche(43114), Fantom(250), Gnosis(100), além de Polygon(137), Arbitrum(42161) e BSC(56).
-
-## Como usar
-1) Substitua no seu repo:
-   - `get_best_quote_async.py`
-   - `tokens_config.py`
-2) (opcional) Escolha a ordem dos agregadores:
-   - `AGGREGATORS=1inch,0x,KyberSwap,ParaSwap,Odos,OpenOcean`
-3) Ative redes novas definindo tokens via ENV:
-   - `TOKENS_<chainId>=addr1,addr2,addr3,...`
-   - Ex.: Base (8453) com USDC + WETH:
-     ```
-     CHAIN_IDS=8453
-     TOKENS_8453=0x833589fC... , 0x4200000000000000000000000000000000000006
-     ```
-
-> Dica: comece com 2–4 tokens por rede (USDC, WETH, USDT, DAI) e aumente depois.
 
